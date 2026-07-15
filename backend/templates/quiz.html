@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyFlow — Quiz AI</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz.css') }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+  <div class="bg-blob blob-1"></div>
+  <div class="bg-blob blob-2"></div>
+
+  <nav class="navbar">
+    <div class="navbar-left">
+      <a href="/menu" class="btn-back">
+        <i class="fa-solid fa-arrow-left"></i>
+      </a>
+      <div class="navbar-brand">
+        <div class="brand-icon"><i class="fa-solid fa-brain"></i></div>
+        <span class="brand-name">Quiz AI</span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="page-wrapper">
+
+    <section class="hero">
+      <div class="hero-badge">
+        <i class="fa-solid fa-sparkles"></i> Powered by AI
+      </div>
+      <h1 class="hero-title">Ayo test<br/>pemahaman kamu!</h1>
+      <p class="hero-sub">Upload materi kamu, AI akan otomatis membuat soal quiz dari isinya.</p>
+    </section>
+
+    <section class="upload-card" id="uploadCard">
+
+      <label class="upload-zone" id="uploadZone" for="fileInput">
+        <div class="upload-icon-wrap">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+        </div>
+        <p class="upload-title">Drag & drop file di sini</p>
+        <p class="upload-sub">atau klik untuk pilih file</p>
+        <div class="upload-formats">
+          <span class="format-tag pdf"><i class="fa-solid fa-file-pdf"></i> PDF</span>
+          <span class="format-tag docx"><i class="fa-solid fa-file-word"></i> DOCX</span>
+        </div>
+      </label>
+      <input type="file" id="fileInput" accept=".pdf,.docx" style="display:none" />
+
+      <div class="file-preview" id="filePreview">
+        <div class="file-preview-icon" id="previewIcon">
+          <i class="fa-solid fa-file-pdf" id="previewTypeIcon"></i>
+        </div>
+        <div class="file-preview-info">
+          <span class="file-preview-name" id="previewName">—</span>
+          <span class="file-preview-size" id="previewSize">—</span>
+        </div>
+        <button class="file-preview-remove" id="btnRemoveFile" title="Hapus file">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <button class="btn-generate" id="btnGenerate" disabled>
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        <span class="btn-text">Buat Quiz Sekarang</span>
+        <span class="btn-loader"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
+      </button>
+
+      <p class="upload-note">
+        <i class="fa-solid fa-shield-halved"></i>
+        File kamu aman dan tidak disimpan permanen.
+      </p>
+
+    </section>
+
+    <section class="how-section">
+      <h2 class="how-title">Cara kerja</h2>
+      <div class="how-steps">
+        <div class="how-step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <span class="step-label">Upload materi</span>
+            <span class="step-desc">PDF atau DOCX dari catatan kamu</span>
+          </div>
+        </div>
+        <div class="how-connector"></div>
+        <div class="how-step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <span class="step-label">AI analisis isi</span>
+            <span class="step-desc">Materi dibaca dan dipahami AI</span>
+          </div>
+        </div>
+        <div class="how-connector"></div>
+        <div class="how-step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <span class="step-label">Quiz siap!</span>
+            <span class="step-desc">10 soal otomatis dibuat untukmu</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="{{ url_for('static', filename='js/quiz.js') }}"></script>
+</body>
+</html>
+

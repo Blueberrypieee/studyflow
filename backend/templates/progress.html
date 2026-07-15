@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyFlow — Progress</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/progress.css') }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+  <div class="bg-blob blob-1"></div>
+  <div class="bg-blob blob-2"></div>
+
+  <nav class="navbar">
+    <div class="navbar-left">
+      <a href="/menu" class="btn-back">
+        <i class="fa-solid fa-arrow-left"></i>
+      </a>
+      <div class="navbar-brand">
+        <div class="brand-icon"><i class="fa-solid fa-chart-line"></i></div>
+        <span class="brand-name">Progress</span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="page-wrapper">
+
+    <section class="section" id="sectionStats">
+      <h2 class="section-title">Statistik</h2>
+      <div class="stats-grid" id="statsGrid"></div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Grafik Skor</h2>
+      <div class="chart-card">
+        <div class="chart-legend">
+          <span class="legend-dot blue"></span>
+          <span class="legend-label">Skor per Quiz (%)</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="scoreChart"></canvas>
+          <div class="chart-empty" id="chartEmpty" style="display:none">
+            <i class="fa-solid fa-chart-line"></i>
+            <span>Belum ada data quiz</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Distribusi Grade</h2>
+      <div class="chart-card">
+        <div class="grade-bars" id="gradeBars"></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">
+        Streak Calendar
+        <span class="streak-badge" id="streakBadge">
+          <i class="fa-solid fa-fire"></i> <span id="streakCount">0</span> hari
+        </span>
+      </h2>
+      <div class="chart-card">
+        <div class="calendar-wrap" id="calendarWrap"></div>
+        <div class="calendar-legend">
+          <span class="cal-legend-box empty"></span><span>Tidak ada</span>
+          <span class="cal-legend-box low"></span><span>1 quiz</span>
+          <span class="cal-legend-box mid"></span><span>2 quiz</span>
+          <span class="cal-legend-box high"></span><span>3+ quiz</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Topik Terlemah</h2>
+      <div class="weak-list" id="weakList"></div>
+      <div class="empty-state" id="weakEmpty" style="display:none">
+        <i class="fa-solid fa-trophy" style="color:var(--amber-500)"></i>
+        <p>Tidak ada topik lemah!</p>
+        <span>Semua materi dijawab dengan benar! </span>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="{{ url_for('static', filename='js/progress.js') }}"></script>
+</body>
+</html>
+

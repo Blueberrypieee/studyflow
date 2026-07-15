@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyFlow — Menu</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/menu.css') }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+  <div class="bg-blob blob-1"></div>
+  <div class="bg-blob blob-2"></div>
+
+  <!-- ── Navbar ─────────────────────────────────────────── -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="brand-icon"><i class="fa-solid fa-bolt-lightning"></i></div>
+      <span class="brand-name">StudyFlow</span>
+    </div>
+    <div class="navbar-right">
+      <button class="btn-logout" id="btnLogout">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        <span>Keluar</span>
+      </button>
+      <button class="btn-hamburger" id="btnHamburger" aria-label="Menu">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── Drawer overlay ─────────────────────────────────── -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+
+  <!-- ── Drawer ─────────────────────────────────────────── -->
+  <div class="drawer" id="drawer">
+    <div class="drawer-header">
+      <div class="drawer-brand">
+        <div class="brand-icon"><i class="fa-solid fa-bolt-lightning"></i></div>
+        <span>StudyFlow</span>
+      </div>
+      <button class="drawer-close" id="drawerClose">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="drawer-user" id="drawerUser">
+      <div class="drawer-avatar" id="drawerAvatar">—</div>
+      <div class="drawer-user-info">
+        <span class="drawer-username" id="drawerUsername">---</span>
+        <span class="drawer-grade" id="drawerGrade">Grade ---</span>
+      </div>
+    </div>
+
+    <nav class="drawer-nav">
+      <a href="/menu" class="drawer-item active">
+        <i class="fa-solid fa-house"></i>
+        <span>Beranda</span>
+      </a>
+      <a href="/pomodoro" class="drawer-item">
+        <i class="fa-solid fa-clock"></i>
+        <span>Pomodoro Timer</span>
+      </a>
+      <a href="/account" class="drawer-item">
+        <i class="fa-solid fa-user-circle"></i>
+        <span>Akun</span>
+      </a>
+    </nav>
+
+    <div class="drawer-footer">
+      <button class="drawer-logout" id="drawerLogout">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        <span>Keluar</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Page ───────────────────────────────────────────── -->
+  <main class="page-wrapper">
+
+    <header class="page-header">
+      <p class="greeting-sub">Selamat datang kembali 👋</p>
+      <h1 class="greeting-main" id="greetingName">---</h1>
+    </header>
+
+    <section class="profile-card" id="profileCard">
+      <div class="card-accent"></div>
+      <div class="avatar-wrap">
+        <div class="avatar" id="avatarInitial">—</div>
+        <div class="avatar-ring"></div>
+      </div>
+      <div class="profile-info">
+        <h2 class="profile-username" id="profileUsername">---</h2>
+        <span class="profile-badge" id="profileGrade">
+          <i class="fa-solid fa-star"></i> Grade ---
+        </span>
+      </div>
+      <div class="card-divider"></div>
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-icon streak"><i class="fa-solid fa-fire"></i></div>
+          <div class="stat-content">
+            <span class="stat-value" id="statStreak">---</span>
+            <span class="stat-label">Streak</span>
+          </div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <div class="stat-icon grade"><i class="fa-solid fa-trophy"></i></div>
+          <div class="stat-content">
+            <span class="stat-value" id="statGrade">---</span>
+            <span class="stat-label">Grade</span>
+          </div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <div class="stat-icon days"><i class="fa-solid fa-calendar-check"></i></div>
+          <div class="stat-content">
+            <span class="stat-value" id="statDays">---</span>
+            <span class="stat-label">Hari belajar</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="menu-section">
+      <h2 class="section-title">Menu Utama</h2>
+      <div class="menu-grid">
+        <a href="/materials" class="menu-card" data-delay="0">
+          <div class="menu-card-icon blue"><i class="fa-solid fa-file-lines"></i></div>
+          <div class="menu-card-text">
+            <span class="menu-card-title">Materi</span>
+            <span class="menu-card-desc">Upload & kelola materi</span>
+          </div>
+          <i class="fa-solid fa-chevron-right menu-card-arrow"></i>
+        </a>
+        <a href="/quiz" class="menu-card" data-delay="1">
+          <div class="menu-card-icon indigo"><i class="fa-solid fa-brain"></i></div>
+          <div class="menu-card-text">
+            <span class="menu-card-title">Quiz AI</span>
+            <span class="menu-card-desc">Generate quiz dari materi</span>
+          </div>
+          <i class="fa-solid fa-chevron-right menu-card-arrow"></i>
+        </a>
+        <a href="/history" class="menu-card" data-delay="2">
+          <div class="menu-card-icon amber"><i class="fa-solid fa-clock-rotate-left"></i></div>
+          <div class="menu-card-text">
+            <span class="menu-card-title">Riwayat</span>
+            <span class="menu-card-desc">Review jawaban salah</span>
+          </div>
+          <i class="fa-solid fa-chevron-right menu-card-arrow"></i>
+        </a>
+        <a href="/progress" class="menu-card" data-delay="3">
+          <div class="menu-card-icon green"><i class="fa-solid fa-chart-line"></i></div>
+          <div class="menu-card-text">
+            <span class="menu-card-title">Progress</span>
+            <span class="menu-card-desc">Pantau perkembangan belajar</span>
+          </div>
+          <i class="fa-solid fa-chevron-right menu-card-arrow"></i>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="{{ url_for('static', filename='js/menu.js') }}"></script>
+</body>
+</html>
+

@@ -1,0 +1,27 @@
+nohup: ignoring input
+==================================================
+[APP] BASE_DIR : /data/data/com.termux/files/home/studyflow/backend
+[APP] DB PATH  : /data/data/com.termux/files/home/studyflow/backend/studyflow.db
+[APP] DB EXISTS: True
+==================================================
+[APP] Tables OK
+ * Serving Flask app 'app'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.18.6:5000
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [26/May/2026 18:57:26] "GET /register HTTP/1.1" 200 -
+127.0.0.1 - - [26/May/2026 18:57:26] "GET /static/css/register.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/May/2026 18:57:26] "GET /static/js/register.js HTTP/1.1" 200 -
+127.0.0.1 - - [26/May/2026 18:57:32] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [26/May/2026 18:57:32] "GET /static/js/login.js HTTP/1.1" 200 -
+127.0.0.1 - - [26/May/2026 18:57:32] "GET /static/css/login.css HTTP/1.1" 200 -
+127.0.0.1 - - [26/May/2026 18:57:47] "GET /register HTTP/1.1" 200 -
+127.0.0.1 - - [26/May/2026 18:57:47] "[36mGET /static/css/register.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [26/May/2026 18:57:47] "[36mGET /static/js/register.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [26/May/2026 18:58:15] "[33mGET /login.html HTTP/1.1[0m" 404 -
+127.0.0.1 - - [26/May/2026 18:58:33] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [26/May/2026 18:58:33] "[36mGET /static/css/login.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [26/May/2026 18:58:33] "[36mGET /static/js/login.js HTTP/1.1[0m" 304 -

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyFlow — Riwayat</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/history.css') }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+  <div class="bg-blob blob-1"></div>
+  <div class="bg-blob blob-2"></div>
+
+  <nav class="navbar">
+    <div class="navbar-left">
+      <a href="/menu" class="btn-back">
+        <i class="fa-solid fa-arrow-left"></i>
+      </a>
+      <div class="navbar-brand">
+        <div class="brand-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+        <span class="brand-name">Riwayat</span>
+      </div>
+    </div>
+    <button class="btn-clear-all" id="btnClearAll" title="Hapus semua riwayat">
+      <i class="fa-solid fa-trash"></i>
+      <span>Hapus Semua</span>
+    </button>
+  </nav>
+
+  <main class="page-wrapper">
+
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="sessions">
+        <i class="fa-solid fa-list-check"></i> Riwayat Quiz
+      </button>
+      <button class="tab-btn" data-tab="mistakes">
+        <i class="fa-solid fa-circle-xmark"></i> Bank Soal Salah
+      </button>
+    </div>
+
+    <div class="filter-row">
+      <button class="filter-btn active" data-filter="all">Semua</button>
+      <button class="filter-btn" data-filter="today">Hari ini</button>
+      <button class="filter-btn" data-filter="week">Minggu ini</button>
+      <button class="filter-btn" data-filter="month">Bulan ini</button>
+    </div>
+
+    <section class="tab-content" id="tabSessions">
+      <div class="summary-row" id="summaryRow"></div>
+      <div class="session-list" id="sessionList"></div>
+      <div class="empty-state" id="emptySession" style="display:none">
+        <i class="fa-solid fa-inbox"></i>
+        <p>Belum ada riwayat quiz</p>
+        <span>Selesaikan quiz untuk melihat hasilnya di sini</span>
+        <a href="/quiz" class="btn-start-quiz">Mulai Quiz</a>
+      </div>
+    </section>
+
+    <section class="tab-content hidden" id="tabMistakes">
+      <div class="mistakes-header">
+        <p class="mistakes-sub" id="mistakesSub">Soal-soal yang pernah kamu jawab salah</p>
+      </div>
+      <div class="mistake-list" id="mistakeList"></div>
+      <div class="empty-state" id="emptyMistake" style="display:none">
+        <i class="fa-solid fa-party-horn" style="color:var(--green-500)"></i>
+        <p>Tidak ada soal salah!</p>
+        <span>Kamu menjawab semua soal dengan benar 🎉</span>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <h3 class="modal-title" id="modalTitle">Hapus semua riwayat?</h3>
+      <p class="modal-desc" id="modalDesc">Tindakan ini tidak bisa dibatalkan.</p>
+      <div class="modal-footer">
+        <button class="btn-cancel" id="btnCancel">Batal</button>
+        <button class="btn-confirm" id="btnConfirm">Hapus</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="{{ url_for('static', filename='js/history.js') }}"></script>
+</body>
+</html>
+

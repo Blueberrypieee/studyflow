@@ -1,0 +1,12 @@
+__pycache__
+app.py
+flask.log
+instance
+models
+nohup.out
+routes
+services
+static
+studyflow.db
+templates
+uploads

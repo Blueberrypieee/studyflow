@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyFlow — Login</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+  <!-- Ambient background blobs -->
+  <div class="bg-blob blob-1"></div>
+  <div class="bg-blob blob-2"></div>
+  <div class="bg-blob blob-3"></div>
+
+  <!-- Main wrapper -->
+  <main class="auth-wrapper">
+
+    <!-- Login card -->
+    <div class="auth-card">
+
+      <!-- Logo / brand -->
+      <div class="brand">
+        <div class="brand-icon">
+          <i class="fa-solid fa-bolt-lightning"></i>
+        </div>
+        <h1 class="brand-name">StudyFlow</h1>
+        <p class="brand-tagline">Belajar lebih cerdas, bukan lebih keras.</p>
+      </div>
+
+      <!-- Form -->
+      <form class="auth-form" id="loginForm" novalidate>
+
+        <!-- Username field -->
+        <div class="field-group" id="usernameGroup">
+          <label class="field-label" for="username">Username</label>
+          <div class="input-wrapper">
+            <span class="input-icon left">
+              <i class="fa-solid fa-user"></i>
+            </span>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              class="input-field"
+              placeholder="Masukkan username kamu"
+              autocomplete="username"
+            />
+          </div>
+          <span class="field-error" id="usernameError"></span>
+        </div>
+
+        <!-- Password field -->
+        <div class="field-group" id="passwordGroup">
+          <label class="field-label" for="password">Password</label>
+          <div class="input-wrapper">
+            <span class="input-icon left">
+              <i class="fa-solid fa-lock"></i>
+            </span>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="input-field"
+              placeholder="Masukkan password kamu"
+              autocomplete="current-password"
+            />
+            <button
+              type="button"
+              class="input-icon right toggle-password"
+              id="togglePassword"
+              aria-label="Toggle password visibility"
+            >
+              <i class="fa-solid fa-eye" id="eyeIcon"></i>
+            </button>
+          </div>
+          <span class="field-error" id="passwordError"></span>
+        </div>
+
+        <!-- Remember me -->
+        <div class="form-options">
+          <label class="checkbox-label">
+            <input type="checkbox" id="rememberMe" />
+            <span class="custom-checkbox"></span>
+            <span class="checkbox-text">Ingat saya</span>
+          </label>
+        </div>
+
+        <!-- Submit button -->
+        <button type="submit" class="btn-login" id="loginBtn">
+          <span class="btn-text">Masuk</span>
+          <span class="btn-loader" id="btnLoader">
+            <i class="fa-solid fa-circle-notch fa-spin"></i>
+          </span>
+        </button>
+
+      </form>
+
+      <!-- Divider -->
+      <div class="divider">
+        <span>atau</span>
+      </div>
+
+      <!-- Register link -->
+      <p class="register-prompt">
+        Belum punya akun?
+        <a href="/register" class="register-link">Daftar sekarang</a>
+      </p>
+
+    </div>
+
+    <!-- Bottom watermark -->
+    <p class="watermark">© 2026 StudyFlow. All rights reserved.</p>
+
+  </main>
+
+  <!-- Toast notification container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+</body>
+</html>
+

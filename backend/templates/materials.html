@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyFlow — Materi</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/materials.css') }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+  <div class="bg-blob blob-1"></div>
+  <div class="bg-blob blob-2"></div>
+  <nav class="navbar">
+    <div class="navbar-left">
+      <a href="/menu" class="btn-back"><i class="fa-solid fa-arrow-left"></i></a>
+      <div class="navbar-brand">
+        <div class="brand-icon"><i class="fa-solid fa-bolt-lightning"></i></div>
+        <span class="brand-name">Materi</span>
+      </div>
+    </div>
+    <button class="btn-new-folder" id="btnNewFolder">
+      <i class="fa-solid fa-folder-plus"></i>
+      <span>Folder Baru</span>
+    </button>
+  </nav>
+  <main class="page-wrapper">
+    <section class="upload-section" id="uploadSection">
+      <label class="upload-zone" id="uploadZone" for="fileInput">
+        <div class="upload-icon-wrap">
+          <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+        </div>
+        <p class="upload-title">Drag & drop file di sini</p>
+        <p class="upload-sub">atau klik untuk pilih file</p>
+        <p class="upload-formats">
+          <i class="fa-solid fa-circle-check"></i> PDF &nbsp;·&nbsp;
+          <i class="fa-solid fa-circle-check"></i> DOCX
+        </p>
+      </label>
+      <input type="file" id="fileInput" accept=".pdf,.docx" multiple style="display:none" />
+      <div class="upload-queue" id="uploadQueue"></div>
+    </section>
+    <section class="toolbar">
+      <div class="search-wrap">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" class="search-input" id="searchInput" placeholder="Cari file atau folder..." />
+        <button class="search-clear" id="searchClear" aria-label="Clear search">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="filter-row">
+        <button class="filter-btn active" data-filter="all">Semua</button>
+        <button class="filter-btn" data-filter="today">Hari ini</button>
+        <button class="filter-btn" data-filter="week">Minggu ini</button>
+        <button class="filter-btn" data-filter="month">Bulan ini</button>
+      </div>
+    </section>
+    <div class="breadcrumb" id="breadcrumb">
+      <span class="breadcrumb-item active" data-folder-id="root">
+        <i class="fa-solid fa-house"></i> Semua Materi
+      </span>
+    </div>
+    <section class="content-area" id="contentArea">
+      <div class="folders-row" id="foldersRow"></div>
+      <div class="files-grid" id="filesGrid"></div>
+      <div class="empty-state" id="emptyState" style="display:none">
+        <i class="fa-solid fa-box-open"></i>
+        <p>Belum ada file di sini</p>
+        <span>Upload PDF atau DOCX untuk mulai belajar</span>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal: New Folder -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modal">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-folder-plus"></i> Folder Baru</h3>
+        <button class="modal-close" id="modalClose"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <label class="field-label" for="folderName">Nama Folder</label>
+        <div class="modal-input-wrap">
+          <input type="text" id="folderName" class="modal-input" placeholder="Contoh: Matematika, Fisika..." maxlength="40" />
+        </div>
+        <span class="field-error" id="folderError"></span>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" id="btnCancel">Batal</button>
+        <button class="btn-create" id="btnCreate">Buat Folder</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Pindah ke Folder -->
+  <div class="modal-overlay" id="moveModalOverlay">
+    <div class="modal" id="moveModal">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-folder-arrow-up"></i> Pindah ke Folder</h3>
+        <button class="modal-close" id="moveModalClose"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <p class="move-file-name" id="moveFileName"></p>
+        <div class="folder-options" id="folderOptions"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+  <script src="{{ url_for('static', filename='js/materials.js') }}"></script>
+</body>
+</html>
+

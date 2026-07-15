@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyFlow — Quiz</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz-play.css') }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+  <div class="bg-blob blob-1"></div>
+  <div class="bg-blob blob-2"></div>
+
+  <nav class="navbar">
+    <div class="navbar-left">
+      <div class="brand-icon"><i class="fa-solid fa-brain"></i></div>
+      <span class="brand-name">Quiz AI</span>
+    </div>
+    <div class="navbar-right">
+      <div class="timer-wrap" id="timerWrap">
+        <i class="fa-solid fa-clock"></i>
+        <span id="timerDisplay">30</span>
+      </div>
+      <span class="q-counter" id="qCounter">1 / 10</span>
+    </div>
+  </nav>
+
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <main class="screen" id="screenQuiz">
+    <div class="quiz-wrapper">
+      <div class="question-card" id="questionCard">
+        <div class="question-label">
+          <i class="fa-solid fa-circle-question"></i>
+          Pertanyaan <span id="qNum">1</span>
+        </div>
+        <p class="question-text" id="questionText">Memuat soal...</p>
+      </div>
+      <div class="options-grid" id="optionsGrid"></div>
+      <button class="btn-next" id="btnNext">
+        <span id="btnNextLabel">Soal Berikutnya</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+  </main>
+
+  <main class="screen hidden" id="screenResult">
+    <div class="result-wrapper">
+      <div class="grade-wrap">
+        <div class="grade-ring" id="gradeRing">
+          <span class="grade-letter" id="gradeLetter">A</span>
+        </div>
+        <p class="grade-label" id="gradeLabel">Luar Biasa!</p>
+      </div>
+      <div class="score-card">
+        <div class="score-row">
+          <div class="score-item">
+            <span class="score-val correct" id="resCorrect">0</span>
+            <span class="score-key">Benar</span>
+          </div>
+          <div class="score-divider"></div>
+          <div class="score-item">
+            <span class="score-val wrong" id="resWrong">0</span>
+            <span class="score-key">Salah</span>
+          </div>
+          <div class="score-divider"></div>
+          <div class="score-item">
+            <span class="score-val pct" id="resPct">0%</span>
+            <span class="score-key">Skor</span>
+          </div>
+        </div>
+      </div>
+      <div class="review-section">
+        <h3 class="review-title">Pembahasan Jawaban</h3>
+        <div class="review-list" id="reviewList"></div>
+      </div>
+      <div class="result-actions">
+        <a href="/quiz" class="btn-retake">
+          <i class="fa-solid fa-rotate-left"></i> Quiz Baru
+        </a>
+        <a href="/menu" class="btn-home">
+          <i class="fa-solid fa-house"></i> Menu
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="{{ url_for('static', filename='js/quiz-play.js') }}"></script>
+</body>
+</html>
+
