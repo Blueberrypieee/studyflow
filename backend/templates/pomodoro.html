@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyFlow — Pomodoro Timer</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pomodoro.css') }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+  <div class="bg-blob blob-1"></div>
+  <div class="bg-blob blob-2"></div>
+
+  <!-- ── Navbar ─────────────────────────────────────────── -->
+  <nav class="navbar">
+    <a href="/menu" class="btn-back">
+      <i class="fa-solid fa-arrow-left"></i>
+    </a>
+    <div class="navbar-brand">
+      <div class="brand-icon"><i class="fa-solid fa-clock"></i></div>
+      <span class="brand-name">Pomodoro Timer</span>
+    </div>
+    <div class="navbar-spacer"></div>
+  </nav>
+
+  <main class="page-wrapper">
+
+    <!-- ── Mode toggle ────────────────────────────────────── -->
+    <section class="mode-toggle" id="modeToggle">
+      <button class="mode-btn focus active" id="btnFocusMode" data-mode="focus">
+        <i class="fa-solid fa-brain"></i>
+        <span>Focus</span>
+      </button>
+      <button class="mode-btn rest" id="btnRestMode" data-mode="rest">
+        <i class="fa-solid fa-mug-hot"></i>
+        <span>Rest</span>
+      </button>
+    </section>
+
+    <!-- ── Duration slider ────────────────────────────────── -->
+    <section class="slider-section">
+      <div class="slider-label-row">
+        <span class="slider-label">Durasi</span>
+        <span class="slider-value" id="sliderValue">25 menit</span>
+      </div>
+      <input
+        type="range"
+        id="durationSlider"
+        class="duration-slider"
+        min="1"
+        max="90"
+        value="25"
+        step="1"
+      />
+      <div class="slider-scale">
+        <span>1</span>
+        <span>90 menit</span>
+      </div>
+    </section>
+
+    <!-- ── Timer ring ─────────────────────────────────────── -->
+    <section class="timer-section">
+      <div class="timer-ring-wrap" id="timerRingWrap">
+        <svg class="timer-ring" viewBox="0 0 240 240">
+          <circle class="ring-track" cx="120" cy="120" r="108" />
+          <circle class="ring-progress" id="ringProgress" cx="120" cy="120" r="108" />
+        </svg>
+        <div class="timer-display">
+          <span class="timer-time" id="timerTime">25:00</span>
+          <span class="timer-status" id="timerStatus">Siap mulai</span>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="timer-controls">
+        <button class="ctrl-btn secondary" id="btnReset" title="Reset">
+          <i class="fa-solid fa-rotate-left"></i>
+        </button>
+        <button class="ctrl-btn primary" id="btnPlayPause" title="Mulai">
+          <i class="fa-solid fa-play" id="playPauseIcon"></i>
+        </button>
+        <button class="ctrl-btn secondary" id="btnSkip" title="Selesai lebih awal">
+          <i class="fa-solid fa-check"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- ── Today's Goals ──────────────────────────────────── -->
+    <section class="card-section">
+      <h2 class="card-title">
+        <i class="fa-solid fa-bullseye"></i> Today's Goals
+      </h2>
+      <div class="tomato-row" id="tomatoRow">
+        <div class="tomato" data-index="0"><i class="fa-solid fa-seedling"></i></div>
+        <div class="tomato" data-index="1"><i class="fa-solid fa-seedling"></i></div>
+        <div class="tomato" data-index="2"><i class="fa-solid fa-seedling"></i></div>
+      </div>
+      <p class="tomato-caption" id="tomatoCaption">0 / 3 sesi fokus selesai hari ini</p>
+    </section>
+
+    <!-- ── Today's Stats ──────────────────────────────────── -->
+    <section class="card-section">
+      <h2 class="card-title">
+        <i class="fa-solid fa-chart-simple"></i> Today's Stats
+      </h2>
+      <div class="stats-row">
+        <div class="stat-box focus">
+          <i class="fa-solid fa-brain"></i>
+          <div class="stat-box-text">
+            <span class="stat-box-val" id="statFocusTime">0m</span>
+            <span class="stat-box-key">Fokus</span>
+          </div>
+        </div>
+        <div class="stat-box rest">
+          <i class="fa-solid fa-mug-hot"></i>
+          <div class="stat-box-text">
+            <span class="stat-box-val" id="statRestTime">0m</span>
+            <span class="stat-box-key">Istirahat</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Music player ───────────────────────────────────── -->
+    <section class="card-section">
+      <h2 class="card-title">
+        <i class="fa-solid fa-music"></i> Musik Pengiring
+      </h2>
+      <div class="music-row">
+        <button class="music-btn" id="btnLofi" data-track="lofi">
+          <i class="fa-solid fa-compact-disc"></i>
+          <span>Lo-Fi</span>
+        </button>
+        <button class="music-btn" id="btnRain" data-track="rain">
+          <i class="fa-solid fa-cloud-rain"></i>
+          <span>Rain</span>
+        </button>
+      </div>
+
+      <div class="volume-row" id="volumeRow" style="display:none">
+        <i class="fa-solid fa-volume-low"></i>
+        <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="60" />
+        <i class="fa-solid fa-volume-high"></i>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Hidden audio elements -->
+  <audio id="lofiAudio" src="{{ url_for('static', filename='audio/lofi.mp3') }}" loop preload="none"></audio>
+  <audio id="rainAudio" src="{{ url_for('static', filename='audio/rain.mp3') }}" loop preload="none"></audio>
+
+  <!-- Alarm sound for completion -->
+  <audio id="alarmAudio" preload="none">
+    <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=" type="audio/wav">
+  </audio>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="{{ url_for('static', filename='js/pomodoro.js') }}"></script>
+</body>
+</html>
+
