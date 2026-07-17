@@ -6,9 +6,11 @@ from models import db
 from models.material import Material
 from models.folder import Folder
 from models.session import QuizSession
+from models.pomodoro import PomodoroSession, PomodoroStats
 from routes.auth import auth_bp
 from routes.materials import materials_bp
 from routes.quiz import quiz_bp
+from routes.pomodoro import pomodoro_bp
 
 load_dotenv()
 
@@ -40,6 +42,7 @@ with app.app_context():
 app.register_blueprint(auth_bp)
 app.register_blueprint(materials_bp)
 app.register_blueprint(quiz_bp)
+app.register_blueprint(pomodoro_bp)
 
 # ── Login required decorator ──────────────────────────────
 def login_required(f):

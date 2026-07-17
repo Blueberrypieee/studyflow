@@ -1,8 +1,7 @@
 /**
  * StudyFlow — pomodoro.js
  * Timestamp-based timer (ga reset pas refresh/tutup tab)
- * State disimpan di backend per-user (belum ada backend = pakai in-memory dulu,
- * struktur function sudah siap tinggal disambungkan ke fetch API)
+ * State disimpan di backend per-user via fetch API
  */
 
 /* ═══════════════════════════════════════════════════════
@@ -33,7 +32,6 @@ let today = {
   tomatoes:   0,
   focusSec:   0,
   restSec:    0,
-  dateKey:    todayKey(),
 };
 
 /* ═══════════════════════════════════════════════════════
@@ -75,15 +73,17 @@ let activeTrack = null; // 'lofi' | 'rain' | null
 /* ═══════════════════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════════════════ */
-function init() {
-  loadTodayFromStorage();  // sementara localStorage-scoped by date, siap diganti fetch API
-  restoreRunningTimer();   // cek ada timer aktif yg belum selesai (dari sebelum refresh)
+async function init() {
   bindEvents();
   applyModeUI();
-  renderTomatoes();
-  renderStats();
   updateSliderUI();
   updateTimerDisplay(state.duration * 60);
+
+  await loadTodayFromServer();
+  await restoreRunningTimer();
+
+  renderTomatoes();
+  renderStats();
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -128,7 +128,7 @@ function updateSliderUI() {
 /* ═══════════════════════════════════════════════════════
    TIMER CORE — timestamp based
 ═══════════════════════════════════════════════════════ */
-function startTimer() {
+async function startTimer() {
   const totalSeconds = state.isPaused
     ? state.remainingAtPause
     : state.duration * 60;
@@ -137,7 +137,7 @@ function startTimer() {
   state.isRunning = true;
   state.isPaused  = false;
 
-  persistRunningTimer();
+  await persistRunningTimer();
 
   sliderSection.classList.add('disabled');
   btnFocusMode.disabled = true;
@@ -152,14 +152,23 @@ function startTimer() {
   tickLoop();
 }
 
-function pauseTimer() {
+async function pauseTimer() {
   const remaining = Math.max(0, Math.round((state.endTime - Date.now()) / 1000));
   state.remainingAtPause = remaining;
   state.isRunning = false;
   state.isPaused  = true;
 
   clearInterval(state.tickInterval);
-  clearRunningTimer();
+
+  try {
+    await fetch('/api/pomodoro/pause', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ remainingSeconds: remaining }),
+    });
+  } catch(err) {
+    console.error('Gagal pause di server:', err);
+  }
 
   playPauseIcon.className = 'fa-solid fa-play';
   btnPlayPause.title      = 'Lanjutkan';
@@ -167,14 +176,19 @@ function pauseTimer() {
   timerStatus.className   = 'timer-status';
 }
 
-function resetTimer() {
+async function resetTimer() {
   clearInterval(state.tickInterval);
-  clearRunningTimer();
 
   state.isRunning = false;
   state.isPaused  = false;
   state.endTime   = null;
   state.remainingAtPause = null;
+
+  try {
+    await fetch('/api/pomodoro/reset', { method: 'POST' });
+  } catch(err) {
+    console.error('Gagal reset di server:', err);
+  }
 
   sliderSection.classList.remove('disabled');
   btnFocusMode.disabled = false;
@@ -208,12 +222,11 @@ function tickLoop() {
 }
 
 /* ── Timer selesai (waktu habis alami) ───────────────── */
-function onTimerComplete() {
+async function onTimerComplete() {
   state.isRunning = false;
-  clearRunningTimer();
 
   const elapsedSec = state.duration * 60;
-  recordSession(elapsedSec);
+  await recordSession(elapsedSec);
 
   timerStatus.textContent = 'Waktu habis! 🎉';
   timerStatus.className   = 'timer-status done';
@@ -237,7 +250,7 @@ function onTimerComplete() {
 }
 
 /* ── Skip / selesaikan lebih awal ────────────────────── */
-function skipTimer() {
+async function skipTimer() {
   if (!state.isRunning && !state.isPaused) return;
 
   const totalPlanned = state.duration * 60;
@@ -247,33 +260,61 @@ function skipTimer() {
   const elapsedSec = totalPlanned - remaining;
 
   clearInterval(state.tickInterval);
-  clearRunningTimer();
 
   if (elapsedSec >= 30) { // minimal 30 detik biar ga di-skip sia-sia
-    recordSession(elapsedSec);
+    await recordSession(elapsedSec);
     showToast('Sesi dicatat sebagian ✅', 'info');
+  } else {
+    try {
+      await fetch('/api/pomodoro/reset', { method: 'POST' });
+    } catch(err) {}
   }
 
-  resetTimer();
+  resetTimerUIOnly();
+}
+
+function resetTimerUIOnly() {
+  state.isRunning = false;
+  state.isPaused  = false;
+  state.endTime   = null;
+  state.remainingAtPause = null;
+
+  sliderSection.classList.remove('disabled');
+  btnFocusMode.disabled = false;
+  btnRestMode.disabled  = false;
+  btnReset.disabled     = true;
+
+  playPauseIcon.className = 'fa-solid fa-play';
+  btnPlayPause.title      = 'Mulai';
+  timerStatus.textContent = 'Siap mulai';
+  timerStatus.className   = 'timer-status';
+  timerRingWrap.classList.remove('alarm');
+
+  updateTimerDisplay(state.duration * 60);
 }
 
 /* ═══════════════════════════════════════════════════════
-   RECORD SESSION → update tomat + stats
-   (nanti tinggal ganti body function ini jadi fetch POST /api/pomodoro/complete)
+   RECORD SESSION → POST /api/pomodoro/complete
 ═══════════════════════════════════════════════════════ */
-function recordSession(elapsedSec) {
-  ensureTodayFresh();
+async function recordSession(elapsedSec) {
+  try {
+    const res  = await fetch('/api/pomodoro/complete', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ mode: state.mode, elapsedSeconds: elapsedSec }),
+    });
+    const data = await res.json();
 
-  if (state.mode === 'focus') {
-    today.focusSec += elapsedSec;
-    if (today.tomatoes < MAX_TOMATOES) {
-      today.tomatoes += 1;
+    if (res.ok && data.stats) {
+      today.tomatoes = data.stats.tomatoes;
+      today.focusSec = data.stats.focusSeconds;
+      today.restSec  = data.stats.restSeconds;
     }
-  } else {
-    today.restSec += elapsedSec;
+  } catch(err) {
+    console.error('Gagal simpan sesi ke server:', err);
+    showToast('Gagal menyimpan sesi. Cek koneksi.', 'error');
   }
 
-  saveTodayToStorage();
   renderTomatoes();
   renderStats();
 }
@@ -294,50 +335,59 @@ function updateTimerDisplay(remainingSeconds) {
 }
 
 /* ═══════════════════════════════════════════════════════
-   PERSIST RUNNING TIMER (resume setelah refresh/tutup tab)
-   NOTE: sementara localStorage per-key khusus timer,
-   nanti diganti fetch ke backend biar sinkron antar device
+   PERSIST RUNNING TIMER → backend (resume antar device)
 ═══════════════════════════════════════════════════════ */
-const TIMER_KEY = 'sf_pomodoro_running_v1';
-
-function persistRunningTimer() {
-  localStorage.setItem(TIMER_KEY, JSON.stringify({
-    mode:     state.mode,
-    duration: state.duration,
-    endTime:  state.endTime,
-  }));
-}
-
-function clearRunningTimer() {
-  localStorage.removeItem(TIMER_KEY);
-}
-
-function restoreRunningTimer() {
-  const raw = localStorage.getItem(TIMER_KEY);
-  if (!raw) return;
-
+async function persistRunningTimer() {
   try {
-    const saved = JSON.parse(raw);
-    const remaining = Math.round((saved.endTime - Date.now()) / 1000);
+    await fetch('/api/pomodoro/start', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        mode:            state.mode,
+        durationMinutes: state.duration,
+        endTime:         state.endTime,
+      }),
+    });
+  } catch(err) {
+    console.error('Gagal simpan timer ke server:', err);
+    showToast('Gagal menyimpan status timer. Cek koneksi.', 'error');
+  }
+}
+
+async function restoreRunningTimer() {
+  try {
+    const res  = await fetch('/api/pomodoro/state');
+    if (res.status === 401) { window.location.href = '/login'; return; }
+
+    const data = await res.json();
+    const sess = data.session;
+
+    if (!sess || !sess.isRunning || !sess.endTime) return;
+
+    const remaining = Math.round((sess.endTime - Date.now()) / 1000);
 
     if (remaining <= 0) {
       // Timer udah abis pas app ditutup — anggap selesai, catat sesi penuh
-      clearRunningTimer();
-      state.mode     = saved.mode;
-      state.duration = saved.duration;
+      state.mode     = sess.mode;
+      state.duration = sess.durationMinutes;
       applyModeUI();
-      recordSession(saved.duration * 60);
+      durationSlider.value = state.duration;
+      updateSliderUI();
+      await recordSession(sess.durationMinutes * 60);
+      await fetch('/api/pomodoro/reset', { method: 'POST' });
       showToast('Sesi sebelumnya selesai saat kamu pergi 🎉', 'info');
       return;
     }
 
     // Masih ada sisa waktu — resume timer
-    state.mode     = saved.mode;
-    state.duration = saved.duration;
-    state.endTime  = saved.endTime;
+    state.mode     = sess.mode;
+    state.duration = sess.durationMinutes;
+    state.endTime  = sess.endTime;
     state.isRunning = true;
 
     durationSlider.value = state.duration;
+    updateSliderUI();
+    applyModeUI();
 
     sliderSection.classList.add('disabled');
     btnFocusMode.disabled = true;
@@ -349,46 +399,29 @@ function restoreRunningTimer() {
     timerStatus.className   = 'timer-status running';
 
     tickLoop();
-  } catch(e) {
-    clearRunningTimer();
+  } catch(err) {
+    console.error('Gagal restore timer:', err);
   }
 }
 
 /* ═══════════════════════════════════════════════════════
-   TODAY'S STATS + TOMATOES (reset otomatis per hari)
-   NOTE: sementara localStorage, nanti diganti fetch ke backend
+   TODAY'S STATS + TOMATOES → GET /api/pomodoro/today
 ═══════════════════════════════════════════════════════ */
-const TODAY_KEY = 'sf_pomodoro_today_v1';
+async function loadTodayFromServer() {
+  try {
+    const res  = await fetch('/api/pomodoro/today');
+    if (res.status === 401) { window.location.href = '/login'; return; }
 
-function todayKey() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-}
+    const data = await res.json();
 
-function loadTodayFromStorage() {
-  const raw = localStorage.getItem(TODAY_KEY);
-  if (raw) {
-    try {
-      const parsed = JSON.parse(raw);
-      if (parsed.dateKey === todayKey()) {
-        today = parsed;
-        return;
-      }
-    } catch(e) {}
+    if (res.ok && data.stats) {
+      today.tomatoes = data.stats.tomatoes;
+      today.focusSec = data.stats.focusSeconds;
+      today.restSec  = data.stats.restSeconds;
+    }
+  } catch(err) {
+    console.error('Gagal load stats hari ini:', err);
   }
-  // Hari baru atau belum ada data → reset
-  today = { tomatoes: 0, focusSec: 0, restSec: 0, dateKey: todayKey() };
-  saveTodayToStorage();
-}
-
-function ensureTodayFresh() {
-  if (today.dateKey !== todayKey()) {
-    today = { tomatoes: 0, focusSec: 0, restSec: 0, dateKey: todayKey() };
-  }
-}
-
-function saveTodayToStorage() {
-  localStorage.setItem(TODAY_KEY, JSON.stringify(today));
 }
 
 function renderTomatoes() {
@@ -499,14 +532,6 @@ function bindEvents() {
   btnLofi.addEventListener('click', () => toggleTrack('lofi'));
   btnRain.addEventListener('click', () => toggleTrack('rain'));
 
-  // Minta izin notifikasi sekali di awal (non-blocking)
-  if ('Notification' in window && Notification.permission === 'default') {
-    // Delay dikit biar ga langsung nge-prompt pas load
-    setTimeout(() => {
-      // Tunggu interaksi user pertama sebelum minta izin (best practice)
-    }, 1000);
-  }
-
   document.addEventListener('click', requestNotifPermissionOnce, { once: true });
 }
 
@@ -536,13 +561,13 @@ function showToast(message, type = 'info', duration = 3000) {
 ═══════════════════════════════════════════════════════ */
 init();
 
-// Re-check freshness kalau tab dibuka lagi setelah lewat tengah malam
+// Re-check stats kalau tab dibuka lagi (misal lewat tengah malam, backend yang handle reset)
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
-    ensureTodayFresh();
-    loadTodayFromStorage();
-    renderTomatoes();
-    renderStats();
+    loadTodayFromServer().then(() => {
+      renderTomatoes();
+      renderStats();
+    });
   }
 });
 
