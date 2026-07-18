@@ -11,6 +11,7 @@ from routes.auth import auth_bp
 from routes.materials import materials_bp
 from routes.quiz import quiz_bp
 from routes.pomodoro import pomodoro_bp
+from routes.account import account_bp
 
 load_dotenv()
 
@@ -43,6 +44,7 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(materials_bp)
 app.register_blueprint(quiz_bp)
 app.register_blueprint(pomodoro_bp)
+app.register_blueprint(account_bp)
 
 # ── Login required decorator ──────────────────────────────
 def login_required(f):
@@ -109,11 +111,17 @@ def progress_page():
 def pomodoro_page():
     return render_template('pomodoro.html')
 
+@app.route('/account')
+@login_required
+def account_page():
+    return render_template('account.html')
+
 if __name__ == '__main__':
     app.run(
         host='0.0.0.0',
         port=5000,
         debug=os.getenv('FLASK_DEBUG', '0') == '1'
     )
+
 
 

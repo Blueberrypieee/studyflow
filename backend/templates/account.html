@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyFlow — Akun</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/account.css') }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+  <div class="bg-blob blob-1"></div>
+  <div class="bg-blob blob-2"></div>
+
+  <!-- ── Navbar ─────────────────────────────────────────── -->
+  <nav class="navbar">
+    <a href="/menu" class="btn-back">
+      <i class="fa-solid fa-arrow-left"></i>
+    </a>
+    <div class="navbar-brand">
+      <div class="brand-icon"><i class="fa-solid fa-user"></i></div>
+      <span class="brand-name">Akun</span>
+    </div>
+    <div class="navbar-spacer"></div>
+  </nav>
+
+  <main class="page-wrapper">
+
+    <!-- ── Profile header ─────────────────────────────────── -->
+    <section class="profile-header" id="profileHeader">
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar" id="profileAvatar">—</div>
+      </div>
+      <h1 class="profile-username" id="profileUsername">---</h1>
+      <p class="profile-joindate" id="profileJoinDate">
+        <i class="fa-regular fa-calendar"></i>
+        <span id="joinDateText">Bergabung sejak ---</span>
+      </p>
+    </section>
+
+    <!-- ── Stats grid ─────────────────────────────────────── -->
+    <section class="section">
+      <h2 class="section-title">Statistik Keseluruhan</h2>
+      <div class="stats-grid">
+
+        <div class="stat-card">
+          <div class="stat-card-icon blue">
+            <i class="fa-solid fa-brain"></i>
+          </div>
+          <div class="stat-card-info">
+            <span class="stat-card-val" id="statTotalFocus">---</span>
+            <span class="stat-card-key">Total Fokus</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-icon green">
+            <i class="fa-solid fa-mug-hot"></i>
+          </div>
+          <div class="stat-card-info">
+            <span class="stat-card-val" id="statTotalRest">---</span>
+            <span class="stat-card-key">Total Istirahat</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-icon amber">
+            <i class="fa-solid fa-fire"></i>
+          </div>
+          <div class="stat-card-info">
+            <span class="stat-card-val" id="statBestStreak">---</span>
+            <span class="stat-card-key">Streak Terbaik</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-icon purple">
+            <i class="fa-solid fa-trophy"></i>
+          </div>
+          <div class="stat-card-info">
+            <span class="stat-card-val" id="statAvgGrade">---</span>
+            <span class="stat-card-key">Grade Rata-rata</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── Account settings ───────────────────────────────── -->
+    <section class="section">
+      <h2 class="section-title">Pengaturan Akun</h2>
+
+      <div class="settings-card">
+        <button class="settings-item" id="btnChangePassword">
+          <div class="settings-item-icon">
+            <i class="fa-solid fa-lock"></i>
+          </div>
+          <div class="settings-item-text">
+            <span class="settings-item-title">Ganti Password</span>
+            <span class="settings-item-desc">Perbarui password akun kamu</span>
+          </div>
+          <i class="fa-solid fa-chevron-right settings-item-arrow"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- ── Danger zone ────────────────────────────────────── -->
+    <section class="section">
+      <h2 class="section-title danger">Zona Berbahaya</h2>
+
+      <div class="settings-card danger-card">
+        <button class="settings-item danger-item" id="btnLogoutAccount">
+          <div class="settings-item-icon danger">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </div>
+          <div class="settings-item-text">
+            <span class="settings-item-title">Keluar</span>
+            <span class="settings-item-desc">Keluar dari akun ini</span>
+          </div>
+          <i class="fa-solid fa-chevron-right settings-item-arrow"></i>
+        </button>
+
+        <div class="settings-divider"></div>
+
+        <button class="settings-item danger-item" id="btnDeleteAccount">
+          <div class="settings-item-icon danger">
+            <i class="fa-solid fa-trash"></i>
+          </div>
+          <div class="settings-item-text">
+            <span class="settings-item-title">Hapus Akun</span>
+            <span class="settings-item-desc">Hapus akun secara permanen</span>
+          </div>
+          <i class="fa-solid fa-chevron-right settings-item-arrow"></i>
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── Modal: Ganti Password ─────────────────────────── -->
+  <div class="modal-overlay" id="passwordModalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fa-solid fa-lock"></i> Ganti Password</h3>
+        <button class="modal-close" id="passwordModalClose"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+
+        <div class="field-group" id="oldPasswordGroup">
+          <label class="field-label" for="oldPassword">Password Lama</label>
+          <div class="input-wrapper">
+            <input type="password" id="oldPassword" class="modal-input" placeholder="Masukkan password lama" autocomplete="current-password" />
+            <button type="button" class="input-toggle" data-target="oldPassword">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
+          <span class="field-error" id="oldPasswordError"></span>
+        </div>
+
+        <div class="field-group" id="newPasswordGroup">
+          <label class="field-label" for="newPassword">Password Baru</label>
+          <div class="input-wrapper">
+            <input type="password" id="newPassword" class="modal-input" placeholder="Min. 6 karakter" autocomplete="new-password" />
+            <button type="button" class="input-toggle" data-target="newPassword">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
+          <span class="field-error" id="newPasswordError"></span>
+        </div>
+
+        <div class="field-group" id="confirmPasswordGroup">
+          <label class="field-label" for="confirmPassword">Konfirmasi Password Baru</label>
+          <div class="input-wrapper">
+            <input type="password" id="confirmPassword" class="modal-input" placeholder="Ulangi password baru" autocomplete="new-password" />
+            <button type="button" class="input-toggle" data-target="confirmPassword">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
+          <span class="field-error" id="confirmPasswordError"></span>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" id="passwordCancel">Batal</button>
+        <button class="btn-confirm" id="passwordSubmit">
+          <span class="btn-text">Simpan</span>
+          <span class="btn-loader"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Modal: Konfirmasi Logout ───────────────────────── -->
+  <div class="modal-overlay" id="logoutModalOverlay">
+    <div class="modal confirm-modal">
+      <div class="confirm-icon warning"><i class="fa-solid fa-right-from-bracket"></i></div>
+      <h3 class="confirm-title">Keluar dari akun?</h3>
+      <p class="confirm-desc">Kamu perlu login lagi untuk mengakses StudyFlow.</p>
+      <div class="modal-footer">
+        <button class="btn-cancel" id="logoutCancel">Batal</button>
+        <button class="btn-confirm-danger" id="logoutConfirm">Keluar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Modal: Konfirmasi Hapus Akun ───────────────────── -->
+  <div class="modal-overlay" id="deleteModalOverlay">
+    <div class="modal confirm-modal">
+      <div class="confirm-icon danger"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <h3 class="confirm-title">Hapus akun secara permanen?</h3>
+      <p class="confirm-desc">Semua data — materi, riwayat quiz, dan statistik kamu akan hilang selamanya. Tindakan ini tidak bisa dibatalkan.</p>
+
+      <div class="field-group" style="text-align:left; margin-top: 1rem;">
+        <label class="field-label" for="deleteConfirmPassword">Masukkan password untuk konfirmasi</label>
+        <div class="input-wrapper">
+          <input type="password" id="deleteConfirmPassword" class="modal-input" placeholder="Password kamu" autocomplete="current-password" />
+        </div>
+        <span class="field-error" id="deleteConfirmError"></span>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" id="deleteCancel">Batal</button>
+        <button class="btn-confirm-danger" id="deleteConfirm">
+          <span class="btn-text">Hapus Akun</span>
+          <span class="btn-loader"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="{{ url_for('static', filename='js/account.js') }}"></script>
+</body>
+</html>
+
