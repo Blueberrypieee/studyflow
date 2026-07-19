@@ -2,6 +2,8 @@ import os
 from functools import wraps
 from flask import Flask, render_template, redirect, url_for, session
 from dotenv import load_dotenv
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from models import db
 from models.material import Material
 from models.folder import Folder
@@ -26,6 +28,32 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER']                  = os.path.join(BASE_DIR, 'uploads')
 app.config['MAX_CONTENT_LENGTH']             = 16 * 1024 * 1024
 
+# ── Session cookie security ────────────────────────────────
+# HttpOnly: JS di browser ga bisa baca cookie (default True di Flask, ditulis eksplisit biar jelas)
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+
+# Secure: cookie cuma dikirim lewat HTTPS.
+# Di lokal Termux (http://localhost) HARUS False, kalau True nanti login gagal terus
+# karena browser nolak kirim cookie di koneksi non-HTTPS.
+# Pas hosting nanti (PythonAnywhere dengan HTTPS), ganti FLASK_ENV=production di .env
+# biar otomatis jadi True.
+app.config['SESSION_COOKIE_SECURE'] = os.getenv('FLASK_ENV') == 'production'
+
+# SameSite: cegah cookie ikut kekirim dari request lintas situs (proteksi dasar CSRF)
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+
+# Session expire otomatis kalau browser ditutup (opsional, bisa dihapus kalau mau "remember me" permanen)
+app.config['PERMANENT_SESSION_LIFETIME'] = 60 * 60 * 24 * 7  # 7 hari
+
+# ── Rate limiting ─────────────────────────────────────────
+# Batasi jumlah request per IP biar ga bisa brute force login/register.
+# storage_uri default (in-memory) cukup buat single-server kayak sekarang.
+limiter = Limiter(
+    key_func=get_remote_address,
+    app=app,
+    default_limits=[],  # ga ada limit global, cuma endpoint tertentu yang dibatasi
+)
+
 # ── Startup logs ──────────────────────────────────────────
 print('=' * 50)
 print(f'[APP] BASE_DIR : {BASE_DIR}')
@@ -45,6 +73,12 @@ app.register_blueprint(materials_bp)
 app.register_blueprint(quiz_bp)
 app.register_blueprint(pomodoro_bp)
 app.register_blueprint(account_bp)
+
+# ── Rate limit khusus endpoint sensitif ────────────────────
+# 5 percobaan per menit per IP — cukup buat user asli yang salah ketik,
+# tapi bikin brute force jadi ga efisien (lambat banget buat nyoba banyak password)
+limiter.limit('5 per minute')(app.view_functions['auth.login'])
+limiter.limit('5 per minute')(app.view_functions['auth.register'])
 
 # ── Login required decorator ──────────────────────────────
 def login_required(f):
@@ -122,6 +156,8 @@ if __name__ == '__main__':
         port=5000,
         debug=os.getenv('FLASK_DEBUG', '0') == '1'
     )
+
+
 
 
 

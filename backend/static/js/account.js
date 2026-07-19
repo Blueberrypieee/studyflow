@@ -1,10 +1,7 @@
 /**
  * StudyFlow — account.js
  * Fetch user data + stats dari backend
- * Ganti password, logout, hapus akun
- *
- * NOTE: endpoint /api/account/* belum ada di backend,
- * struktur fetch sudah disiapkan tinggal disambungkan.
+ * Ganti password, logout
  */
 
 /* ── DOM refs ────────────────────────────────────────────── */
@@ -19,7 +16,6 @@ const statAvgGrade     = document.getElementById('statAvgGrade');
 
 const btnChangePassword = document.getElementById('btnChangePassword');
 const btnLogoutAccount  = document.getElementById('btnLogoutAccount');
-const btnDeleteAccount  = document.getElementById('btnDeleteAccount');
 
 const toastContainer    = document.getElementById('toastContainer');
 
@@ -171,55 +167,6 @@ document.getElementById('logoutConfirm').addEventListener('click', async () => {
     await fetch('/api/logout', { method: 'POST' });
   } catch(e) {}
   window.location.href = '/login';
-});
-
-/* ═══════════════════════════════════════════════════════
-   HAPUS AKUN
-═══════════════════════════════════════════════════════ */
-const deleteModalOverlay   = document.getElementById('deleteModalOverlay');
-const deleteConfirmPassword = document.getElementById('deleteConfirmPassword');
-const deleteConfirmBtn     = document.getElementById('deleteConfirm');
-
-btnDeleteAccount.addEventListener('click', () => {
-  deleteConfirmPassword.value = '';
-  document.getElementById('deleteConfirmError').textContent = '';
-  deleteModalOverlay.classList.add('open');
-});
-document.getElementById('deleteCancel').addEventListener('click', () => deleteModalOverlay.classList.remove('open'));
-deleteModalOverlay.addEventListener('click', e => {
-  if (e.target === deleteModalOverlay) deleteModalOverlay.classList.remove('open');
-});
-
-deleteConfirmBtn.addEventListener('click', async () => {
-  const password = deleteConfirmPassword.value.trim();
-
-  if (!password) {
-    document.getElementById('deleteConfirmError').textContent = 'Password wajib diisi.';
-    return;
-  }
-
-  setBtnLoading(deleteConfirmBtn, true);
-
-  try {
-    const res  = await fetch('/api/account/delete', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ password }),
-    });
-    const data = await res.json();
-
-    if (!res.ok) {
-      document.getElementById('deleteConfirmError').textContent = data.error || 'Gagal menghapus akun.';
-      return;
-    }
-
-    window.location.href = '/login';
-
-  } catch (err) {
-    showToast('Terjadi kesalahan. Coba lagi.', 'error');
-  } finally {
-    setBtnLoading(deleteConfirmBtn, false);
-  }
 });
 
 /* ═══════════════════════════════════════════════════════

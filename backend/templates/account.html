@@ -122,19 +122,6 @@
           </div>
           <i class="fa-solid fa-chevron-right settings-item-arrow"></i>
         </button>
-
-        <div class="settings-divider"></div>
-
-        <button class="settings-item danger-item" id="btnDeleteAccount">
-          <div class="settings-item-icon danger">
-            <i class="fa-solid fa-trash"></i>
-          </div>
-          <div class="settings-item-text">
-            <span class="settings-item-title">Hapus Akun</span>
-            <span class="settings-item-desc">Hapus akun secara permanen</span>
-          </div>
-          <i class="fa-solid fa-chevron-right settings-item-arrow"></i>
-        </button>
       </div>
     </section>
 
@@ -202,31 +189,6 @@
       <div class="modal-footer">
         <button class="btn-cancel" id="logoutCancel">Batal</button>
         <button class="btn-confirm-danger" id="logoutConfirm">Keluar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── Modal: Konfirmasi Hapus Akun ───────────────────── -->
-  <div class="modal-overlay" id="deleteModalOverlay">
-    <div class="modal confirm-modal">
-      <div class="confirm-icon danger"><i class="fa-solid fa-triangle-exclamation"></i></div>
-      <h3 class="confirm-title">Hapus akun secara permanen?</h3>
-      <p class="confirm-desc">Semua data — materi, riwayat quiz, dan statistik kamu akan hilang selamanya. Tindakan ini tidak bisa dibatalkan.</p>
-
-      <div class="field-group" style="text-align:left; margin-top: 1rem;">
-        <label class="field-label" for="deleteConfirmPassword">Masukkan password untuk konfirmasi</label>
-        <div class="input-wrapper">
-          <input type="password" id="deleteConfirmPassword" class="modal-input" placeholder="Password kamu" autocomplete="current-password" />
-        </div>
-        <span class="field-error" id="deleteConfirmError"></span>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn-cancel" id="deleteCancel">Batal</button>
-        <button class="btn-confirm-danger" id="deleteConfirm">
-          <span class="btn-text">Hapus Akun</span>
-          <span class="btn-loader"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
-        </button>
       </div>
     </div>
   </div>
