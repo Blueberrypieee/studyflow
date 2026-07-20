@@ -9,8 +9,47 @@ materials_bp = Blueprint('materials', __name__)
 
 ALLOWED = {'pdf', 'docx'}
 
-def allowed_file(filename):
+# ── File signature (magic bytes) ──────────────────────────
+# Setiap format file punya beberapa byte awal yang unik & tetap,
+# ga peduli namanya diganti apa aja. Ini yang kita cek biar orang
+# ga bisa nyamarin file berbahaya jadi .pdf/.docx cuma dengan rename.
+FILE_SIGNATURES = {
+    'pdf':  [b'%PDF'],
+    # .docx sebenarnya adalah file ZIP (Office Open XML), makanya
+    # signature-nya sama kayak ZIP: PK\x03\x04 (paling umum) atau varian lain
+    'docx': [b'PK\x03\x04', b'PK\x05\x06', b'PK\x07\x08'],
+}
+
+MAX_UPLOAD_SIZE = 16 * 1024 * 1024  # 16MB, samain sama MAX_CONTENT_LENGTH di app.py
+
+def allowed_extension(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED
+
+def sanitize_display_name(filename):
+    """
+    Bersihin nama file asli sebelum disimpan sebagai display name.
+    Nama file yang beneran dipakai di disk selalu UUID random (di baris upload),
+    ini cuma buat nama yang ditampilkan ke user, tapi tetap perlu dibersihkan
+    dari karakter path traversal (../, /, \\) dan dibatasi panjangnya.
+    """
+    name = os.path.basename(filename)  # buang folder path kalau ada yang nyelip
+    name = name.replace('..', '')      # jaga-jaga tambahan
+    return name[:255]                   # batasi panjang nama
+
+def verify_file_signature(file_storage, ext):
+    """
+    Baca beberapa byte pertama file (tanpa ganggu pointer file),
+    lalu cocokkan dengan magic bytes yang valid untuk ekstensi tsb.
+    Return True kalau isi file beneran sesuai tipe yang diklaim.
+    """
+    signatures = FILE_SIGNATURES.get(ext)
+    if not signatures:
+        return False
+
+    header = file_storage.stream.read(8)
+    file_storage.stream.seek(0)  # balikin pointer ke awal biar bisa di-save normal setelahnya
+
+    return any(header.startswith(sig) for sig in signatures)
 
 def get_current_user_id():
     return session.get('user_id')
@@ -31,10 +70,18 @@ def upload():
     if file.filename == '':
         return jsonify({'error': 'File kosong.'}), 400
 
-    if not allowed_file(file.filename):
+    if not allowed_extension(file.filename):
         return jsonify({'error': 'Format tidak didukung. Gunakan PDF atau DOCX.'}), 400
 
-    ext      = file.filename.rsplit('.', 1)[1].lower()
+    ext = file.filename.rsplit('.', 1)[1].lower()
+
+    # ── Validasi isi file, bukan cuma nama ─────────────────
+    # Ini mencegah orang upload file berbahaya yang cuma di-rename
+    # supaya kelihatan seperti .pdf/.docx (misal: virus.exe → virus.pdf)
+    if not verify_file_signature(file, ext):
+        print(f'[UPLOAD] DITOLAK — file "{file.filename}" isinya bukan {ext.upper()} asli (signature mismatch) user={user_id}')
+        return jsonify({'error': f'File bukan {ext.upper()} yang valid. Kemungkinan file rusak atau ekstensi dipalsukan.'}), 400
+
     filename = f'{uuid.uuid4().hex}.{ext}'
     filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
 
@@ -42,9 +89,17 @@ def upload():
     file.save(filepath)
     size = os.path.getsize(filepath)
 
+    # ── Double check ukuran setelah tersimpan ──────────────
+    # MAX_CONTENT_LENGTH di app.py udah nolak duluan kalau kegedean,
+    # ini cuma jaring pengaman tambahan + bersihin file kalau lolos tapi ternyata over
+    if size > MAX_UPLOAD_SIZE:
+        os.remove(filepath)
+        print(f'[UPLOAD] DITOLAK — file terlalu besar ({size} bytes) user={user_id}')
+        return jsonify({'error': 'Ukuran file melebihi batas maksimal 16MB.'}), 400
+
     material = Material(
         user_id  = user_id,
-        name     = file.filename,
+        name     = sanitize_display_name(file.filename),
         type     = ext,
         size     = size,
         folder   = folder if folder else None,
@@ -201,4 +256,5 @@ def delete_folder(folder_id):
     print(f'[FOLDER] Deleted id={folder_id} user={user_id}, {len(materials_in_folder)} files moved to root')
 
     return jsonify({'message': 'Folder berhasil dihapus.'}), 200
+
 

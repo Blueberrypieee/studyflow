@@ -222,11 +222,13 @@ async function moveFile(fileId, folderId) {
 
 /* ── Upload ───────────────────────────────────────────── */
 function handleFiles(fileList) {
-  const allowed = ['application/pdf','application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
   Array.from(fileList).forEach(file => {
     const ext  = file.name.split('.').pop().toLowerCase();
     const type = ext==='pdf'?'pdf':ext==='docx'?'docx':null;
-    if (!type||!allowed.includes(file.type)) { showToast(`${file.name}: hanya PDF & DOCX.`,'error'); return; }
+    // Validasi di frontend cuma buat UX cepat (biar user langsung tau kalau salah format).
+    // Validasi SEBENARNYA (cek isi file / magic bytes) tetap dilakukan di backend,
+    // karena validasi frontend selalu bisa dilewati orang yang paham DevTools.
+    if (!type) { showToast(`${file.name}: hanya PDF & DOCX.`,'error'); return; }
     uploadFile(file, type);
   });
 }
@@ -244,8 +246,21 @@ async function uploadFile(file, type) {
       <div class="upload-item-meta">${formatSize(file.size)} · Mengupload...</div>
       <div class="upload-progress-bar"><div class="upload-progress-fill" id="fill-${itemId}" style="width:0%"></div></div>
     </div>
-    <span class="upload-item-status" id="status-${itemId}"><i class="fa-solid fa-circle-notch fa-spin"></i></span>`;
+    <span class="upload-item-status" id="status-${itemId}"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
+    <button class="upload-item-remove" id="remove-${itemId}" title="Hapus dari daftar">
+      <i class="fa-solid fa-xmark"></i>
+    </button>`;
   queueEl.appendChild(item);
+
+  // Tombol X — selalu bisa dipakai buat nyingkirin item dari daftar,
+  // baik pas masih loading, sukses, atau gagal (misal file ditolak validasi backend)
+  const removeItem = () => {
+    item.style.transition = 'opacity .3s ease';
+    item.style.opacity = '0';
+    setTimeout(() => item.remove(), 300);
+  };
+  document.getElementById(`remove-${itemId}`).addEventListener('click', removeItem);
+
   let pct = 0;
   const fill = document.getElementById(`fill-${itemId}`);
   const iv = setInterval(() => { pct=Math.min(pct+Math.random()*15+5,90); fill.style.width=`${pct}%`; },200);
@@ -267,11 +282,14 @@ async function uploadFile(file, type) {
     showToast(`${file.name} berhasil diupload!`,'success');
     await loadFiles();
     render();
-    setTimeout(()=>{ item.style.transition='opacity .3s ease'; item.style.opacity='0'; setTimeout(()=>item.remove(),300); },2000);
+    setTimeout(removeItem, 2000);
   } catch(err) {
     clearInterval(iv);
     fill.style.background='#EF4444';
+    fill.style.width='100%';
+    document.getElementById(`status-${itemId}`).className='upload-item-status error';
     document.getElementById(`status-${itemId}`).innerHTML='<i class="fa-solid fa-circle-xmark"></i>';
+    item.querySelector('.upload-item-meta').textContent = err.message;
     showToast(err.message,'error');
   }
 }
@@ -409,4 +427,5 @@ function showToast(message,type='info',duration=3000) {
 }
 
 init();
+
 

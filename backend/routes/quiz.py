@@ -11,6 +11,22 @@ from services.ai_service import generate_quiz
 
 quiz_bp = Blueprint('quiz', __name__)
 
+# ── File signature (magic bytes) ──────────────────────────
+# Sama persis kayak validasi di routes/materials.py — mencegah
+# orang upload file berbahaya yang cuma di-rename jadi .pdf/.docx
+FILE_SIGNATURES = {
+    'pdf':  [b'%PDF'],
+    'docx': [b'PK\x03\x04', b'PK\x05\x06', b'PK\x07\x08'],
+}
+
+def verify_file_signature(file_storage, ext):
+    signatures = FILE_SIGNATURES.get(ext)
+    if not signatures:
+        return False
+    header = file_storage.stream.read(8)
+    file_storage.stream.seek(0)  # balikin pointer biar bisa di-save normal
+    return any(header.startswith(sig) for sig in signatures)
+
 def get_current_user_id():
     return session.get('user_id')
 
@@ -32,6 +48,11 @@ def generate():
     ext = file.filename.rsplit('.', 1)[-1].lower()
     if ext not in ['pdf', 'docx']:
         return jsonify({'error': 'Format tidak didukung.'}), 400
+
+    # ── Validasi isi file, bukan cuma nama ─────────────────
+    if not verify_file_signature(file, ext):
+        print(f'[QUIZ] DITOLAK — file "{file.filename}" isinya bukan {ext.upper()} asli user={user_id}')
+        return jsonify({'error': f'File bukan {ext.upper()} yang valid. Kemungkinan file rusak atau ekstensi dipalsukan.'}), 400
 
     tmp_filename = f'{uuid.uuid4().hex}.{ext}'
     tmp_path     = os.path.join(current_app.config['UPLOAD_FOLDER'], tmp_filename)
@@ -116,4 +137,5 @@ def delete_all_sessions():
     print(f'[QUIZ] All sessions deleted user={user_id}')
 
     return jsonify({'message': 'Semua riwayat dihapus.'}), 200
+
 
