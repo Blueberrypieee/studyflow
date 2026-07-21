@@ -89,9 +89,11 @@ btnGenerate.addEventListener('click', async () => {
 
     showToast('Quiz berhasil dibuat! Memulai...', 'success');
 
+    // Biarkan loading tetap aktif sampai redirect, biar ga sempet
+    // keliatan tombol balik normal sepersekian detik sebelum pindah halaman
     setTimeout(() => {
       window.location.href = '/quiz-play';
-    }, 1000);
+    }, 800);
 
   } catch (err) {
     setLoading(false);
@@ -103,6 +105,12 @@ btnGenerate.addEventListener('click', async () => {
 function setLoading(state) {
   btnGenerate.classList.toggle('loading', state);
   btnGenerate.disabled = state;
+
+  // Kunci file input & tombol hapus selama proses generate,
+  // biar user ga bisa ganti file di tengah jalan
+  btnRemove.disabled  = state;
+  fileInput.disabled  = state;
+  uploadZone.classList.toggle('locked', state);
 }
 
 function formatSize(bytes) {
@@ -123,7 +131,7 @@ function showToast(message, type = 'info', duration = 3200) {
   }, duration);
 }
 
-/* ── Fix label upload zone CSS ───────────────────────────── */
+/* ── Loading state untuk tombol Generate Quiz ────────────── */
 (function() {
   const s = document.createElement('style');
   s.textContent = `
@@ -131,7 +139,40 @@ function showToast(message, type = 'info', duration = 3200) {
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       cursor: pointer; width: 100%; text-align: center;
-    }`;
+      transition: opacity 0.2s ease;
+    }
+    label.upload-zone.locked {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    /* Sembunyikan konten normal, tampilkan loader saat class .loading aktif */
+    .btn-generate .btn-loader {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .btn-generate.loading .btn-icon,
+    .btn-generate.loading .btn-text {
+      display: none;
+    }
+    .btn-generate.loading .btn-loader {
+      display: flex;
+    }
+    .btn-generate.loading {
+      opacity: 0.85;
+      cursor: not-allowed;
+    }
+
+    #btnRemoveFile:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+  `;
   document.head.appendChild(s);
 })();
+
 

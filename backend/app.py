@@ -1,9 +1,10 @@
 import os
 from functools import wraps
-from flask import Flask, render_template, redirect, url_for, session
+from flask import Flask, render_template, redirect, url_for, session, jsonify
 from dotenv import load_dotenv
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_wtf.csrf import CSRFProtect, generate_csrf
 from models import db
 from models.material import Material
 from models.folder import Folder
@@ -53,6 +54,29 @@ limiter = Limiter(
     app=app,
     default_limits=[],  # ga ada limit global, cuma endpoint tertentu yang dibatasi
 )
+
+# ── CSRF Protection ───────────────────────────────────────
+# Mencegah situs lain diam-diam nyuruh browser user ngirim request
+# (misal ganti password, hapus data) ke StudyFlow tanpa sepengetahuan user.
+# Semua request POST/PUT/PATCH/DELETE wajib bawa token CSRF yang valid,
+# kecuali endpoint yang di-exempt secara eksplisit (lihat di bawah).
+csrf = CSRFProtect(app)
+
+@app.route('/api/csrf-token', methods=['GET'])
+def get_csrf_token():
+    """
+    Endpoint buat JS ambil token CSRF pas halaman pertama kali load,
+    dipakai ulang di semua fetch POST/PUT/PATCH/DELETE selanjutnya.
+    """
+    return jsonify({'csrfToken': generate_csrf()}), 200
+
+@app.errorhandler(400)
+def handle_csrf_error(e):
+    # CSRFProtect defaultnya bikin halaman HTML error, kita ubah jadi JSON
+    # biar konsisten sama response API lainnya dan gampang dihandle di JS.
+    if 'CSRF' in str(e):
+        return jsonify({'error': 'Sesi kamu sudah tidak valid, silakan muat ulang halaman.'}), 400
+    return e
 
 # ── Startup logs ──────────────────────────────────────────
 print('=' * 50)
@@ -156,6 +180,7 @@ if __name__ == '__main__':
         port=5000,
         debug=os.getenv('FLASK_DEBUG', '0') == '1'
     )
+
 
 
 
